@@ -10,24 +10,17 @@ namespace HtmlDocument
 {
     class ParserHtmlTable
     {
-        [DllImport("KERNEL32.DLL", EntryPoint = "SetProcessWorkingSetSize", SetLastError = true, CallingConvention = CallingConvention.StdCall)]
-        internal static extern bool SetProcessWorkingSetSize(IntPtr pProcess, int dwMinimumWorkingSetSize, int dwMaximumWorkingSetSize);
-
-        [DllImport("KERNEL32.DLL", EntryPoint = "GetCurrentProcess", SetLastError = true, CallingConvention = CallingConvention.StdCall)]
-        internal static extern IntPtr GetCurrentProcess();
-
-
         private readonly string _fileName;
         public bool HaveTable
         {
             get
             {
-                WebBrowser web = new WebBrowser {DocumentText = ""};
+                WebBrowser web = new WebBrowser { DocumentText = "" };
                 web.Document.OpenNew(true);
                 web.Document.Write(File.ReadAllText(_fileName, Encoding.Default));
-                HtmlElementCollection tables = web.Document.GetElementsByTagName("table");
-
-                return tables.Count != 0;
+                int tablesCount = web.Document.GetElementsByTagName("table").Count;
+                web.Dispose();
+                return tablesCount != 0;
             }
         }
 
@@ -70,8 +63,6 @@ namespace HtmlDocument
             webCell.Dispose();
             webRows.Dispose();
             webAllTables.Dispose();
-
-            SetProcessWorkingSetSize(GetCurrentProcess(), -1, -1);
 
             return rezList;
         }
